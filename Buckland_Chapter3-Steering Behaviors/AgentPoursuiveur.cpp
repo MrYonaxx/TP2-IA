@@ -6,9 +6,5 @@ AgentPoursuiveur::AgentPoursuiveur(GameWorld* world, Vector2D position, double r
 
     Vehicle(world, position, rotation, velocity, mass, max_force, max_speed, max_turn_rate, scale)
 {
-   // Steering()->AlignmentOn();
-    //Steering()->FlockingOn();
-    m_pSteering = new SteeringBehavior(this);
     Steering()->OffsetPursuitOn(v, offset);
-    //Steering()->AlignmentOn();
 }

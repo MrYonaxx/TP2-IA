@@ -13,9 +13,10 @@
 #include "misc/Stream_Utility_Functions.h"
 
 #include "AgentPoursuiveur.h"
-
+#include "AgentLeader.h"
 
 #include "resource.h"
+#include <math.h>
 
 #include <list>
 using std::list;
@@ -92,27 +93,29 @@ GameWorld::GameWorld(int cx, int cy):
   }
 #endif*/
 
+
+
   // Spawn Leader     
   Vector2D SpawnPos = Vector2D(cx/2.0+RandomClamped()*cx/2.0,
   cy / 2.0 + RandomClamped() * cy / 2.0);
 
 
-  Vehicle* pVehicle = new Vehicle(this,
+  AgentLeader* pVehicle = new AgentLeader(this,
       SpawnPos,                 //initial position
       RandFloat() * TwoPi,        //start rotation
       Vector2D(0, 0),            //velocity
       Prm.VehicleMass,          //mass
       Prm.MaxSteeringForce,     //max force
-      Prm.MaxSpeed / 2,             //max velocity
+      Prm.MaxSpeed * 0.9f,             //max velocity
       Prm.MaxTurnRatePerSecond, //max turn rate
       Prm.VehicleScale);        //scale
 
 
   m_Vehicles.push_back(pVehicle);
-  m_Vehicles[0]->SetScale(Vector2D(10, 10));
-  m_Vehicles[0]->Steering()->WanderOn();
   //add it to the cell subdivision
   m_pCellSpace->AddEntity(pVehicle);
+
+
 
 
   // spawn Agent poursuiveur
@@ -301,13 +304,38 @@ void GameWorld::SetCrosshair(POINTS p)
   m_vCrosshair.y = (double)p.y;
 }
 
-
+bool formation = false;
 //------------------------- HandleKeyPresses -----------------------------
 void GameWorld::HandleKeyPresses(WPARAM wParam)
 {
 
   switch(wParam)
   {
+  case 'A':
+  {
+      if (!formation) 
+      {
+          float posX = 0;
+          float posY = 0;
+          float angleInterval = 360.0f / m_Vehicles.size();
+          float radius = 50;
+          for (unsigned int i = 1; i < m_Vehicles.size(); ++i)
+          {
+              posX = cos(i * DegsToRads(angleInterval)) * radius;
+              posY = sin(i * DegsToRads(angleInterval)) * radius;
+              m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[0], Vector2D(posX, posY));
+          }
+      }
+      else 
+      {
+          for (unsigned int i = 1; i < m_Vehicles.size(); ++i)
+          {
+              m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], Vector2D(0, -1));
+          }
+      }
+      formation = !formation;
+  }
+  break;
   case 'U':
     {
       delete m_pPath;

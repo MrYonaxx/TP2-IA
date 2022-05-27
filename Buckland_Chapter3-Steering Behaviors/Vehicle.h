@@ -26,7 +26,7 @@ class SteeringBehavior;
 class Vehicle : public MovingEntity
 {
 
-protected:
+private:
 
   //a pointer to the world data. So a vehicle can access any obstacle,
   //path, wall or agent data
