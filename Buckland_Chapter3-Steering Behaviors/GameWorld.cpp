@@ -317,6 +317,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
   {
   case 'A':
   {
+      // Active la formation en cercle
       if (!formation) 
       {
           float posX = 0;
@@ -332,6 +333,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
       }
       else 
       {
+          // Formation en ligne
           for (unsigned int i = 1; i < m_Vehicles.size(); ++i)
           {
               m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], Vector2D(0, -1));
@@ -406,11 +408,29 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
         {
             m_Vehicles[0]->Steering()->WanderOff();
             m_Vehicles[0]->Steering()->SetUserControl(true);
+
+            // Formation en cercle
+            float posX = 0;
+            float posY = 0;
+            float angleInterval = 360.0f / m_Vehicles.size();
+            float radius = 50;
+            for (unsigned int i = 1; i < m_Vehicles.size(); ++i)
+            {
+                posX = cos(i * DegsToRads(angleInterval)) * radius;
+                posY = sin(i * DegsToRads(angleInterval)) * radius;
+                m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[0], Vector2D(posX, posY));
+            }
         }
         else
         {
             m_Vehicles[0]->Steering()->WanderOn();
             m_Vehicles[0]->Steering()->SetUserControl(false);
+
+            // Formation en ligne
+            for (unsigned int i = 1; i < m_Vehicles.size(); ++i)
+            {
+                m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], Vector2D(0, -1));
+            }
         }
         break;
 
