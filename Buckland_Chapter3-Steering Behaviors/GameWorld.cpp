@@ -353,7 +353,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
     }
     break;
 
-  case 'H':
+    case 'H':
       ToggleViewKeys();
       break;
 
@@ -434,6 +434,21 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
         m_Input.y = 0.0f;
         break;
 
+    case 'V':
+        //on met les pairs en offset avec les vehicules i-2 et les impairs
+        for (unsigned int i = 1; i < m_Vehicles.size(); ++i)
+        {
+            if (i%2 == 0)
+            {
+                m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i<3?0:i-2], Vector2D(0, 10));
+            }
+            else
+            {
+
+                m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i < 3 ? 0 : i - 2], Vector2D(0,-10));
+            }
+        }
+        break;
 
   }//end switch
 }
