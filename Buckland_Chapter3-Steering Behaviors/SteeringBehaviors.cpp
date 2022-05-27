@@ -25,6 +25,7 @@ SteeringBehavior::SteeringBehavior(Vehicle* agent):
                                   
              
              m_pVehicle(agent),
+             m_userControlled(false),
              m_iFlags(0),
              m_dDBoxLength(Prm.MinDetectionBoxLength),
              m_dWeightCohesion(Prm.CohesionWeight),
@@ -87,44 +88,52 @@ Vector2D SteeringBehavior::Calculate()
   //reset the steering force
   m_vSteeringForce.Zero();
 
-  //use space partitioning to calculate the neighbours of this vehicle
-  //if switched on. If not, use the standard tagging system
-  if (!isSpacePartitioningOn())
+  if (!m_userControlled)
   {
-    //tag neighbors if any of the following 3 group behaviors are switched on
-    if (On(separation) || On(allignment) || On(cohesion))
-    {
-      m_pVehicle->World()->TagVehiclesWithinViewRange(m_pVehicle, m_dViewDistance);
-    }
+
+      //use space partitioning to calculate the neighbours of this vehicle
+      //if switched on. If not, use the standard tagging system
+      if (!isSpacePartitioningOn())
+      {
+          //tag neighbors if any of the following 3 group behaviors are switched on
+          if (On(separation) || On(allignment) || On(cohesion))
+          {
+              m_pVehicle->World()->TagVehiclesWithinViewRange(m_pVehicle, m_dViewDistance);
+          }
+      }
+      else
+      {
+          //calculate neighbours in cell-space if any of the following 3 group
+          //behaviors are switched on
+          if (On(separation) || On(allignment) || On(cohesion))
+          {
+              m_pVehicle->World()->CellSpace()->CalculateNeighbors(m_pVehicle->Pos(), m_dViewDistance);
+          }
+      }
+
+      switch (m_SummingMethod)
+      {
+      case weighted_average:
+
+          m_vSteeringForce = CalculateWeightedSum(); break;
+
+      case prioritized:
+
+          m_vSteeringForce = CalculatePrioritized(); break;
+
+      case dithered:
+
+          m_vSteeringForce = CalculateDithered(); break;
+
+      default:m_vSteeringForce = Vector2D(0, 0);
+
+      }//end switch
   }
+
   else
   {
-    //calculate neighbours in cell-space if any of the following 3 group
-    //behaviors are switched on
-    if (On(separation) || On(allignment) || On(cohesion))
-    {
-      m_pVehicle->World()->CellSpace()->CalculateNeighbors(m_pVehicle->Pos(), m_dViewDistance);
-    }
+      m_vSteeringForce = Seek(m_pVehicle->Pos() + m_pVehicle->Input() * 50);
   }
-
-  switch (m_SummingMethod)
-  {
-  case weighted_average:
-    
-    m_vSteeringForce = CalculateWeightedSum(); break;
-
-  case prioritized:
-
-    m_vSteeringForce = CalculatePrioritized(); break;
-
-  case dithered:
-    
-    m_vSteeringForce = CalculateDithered();break;
-
-  default:m_vSteeringForce = Vector2D(0,0); 
-
-  }//end switch
-
   return m_vSteeringForce;
 }
 

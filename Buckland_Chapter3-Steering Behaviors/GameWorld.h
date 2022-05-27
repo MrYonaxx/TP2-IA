@@ -35,6 +35,8 @@ class GameWorld
 { 
 private:
 
+  Vector2D                      m_Input;
+
   //a container of all the moving entities
   std::vector<Vehicle*>         m_Vehicles;
 

@@ -193,7 +193,11 @@ void GameWorld::Update(double time_elapsed)
   for (unsigned int a=0; a<m_Vehicles.size(); ++a)
   {
     m_Vehicles[a]->Update(time_elapsed);
+    m_Vehicles[a]->SetInput(m_Input);
   }
+
+  //m_Input.x = 0.0;
+  //m_Input.y = 0.0;
 }
   
 
@@ -349,6 +353,10 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
     }
     break;
 
+  case 'H':
+      ToggleViewKeys();
+      break;
+
     case 'P':
       
       TogglePause(); break;
@@ -392,6 +400,40 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
           }
         }
         break;
+
+    case 'C':
+        if (m_Vehicles[0]->Steering()->isWanderOn())
+        {
+            m_Vehicles[0]->Steering()->WanderOff();
+            m_Vehicles[0]->Steering()->SetUserControl(true);
+        }
+        else
+        {
+            m_Vehicles[0]->Steering()->WanderOn();
+            m_Vehicles[0]->Steering()->SetUserControl(false);
+        }
+        break;
+
+    case VK_UP:
+        m_Input.x = 0.0f;
+        m_Input.y = -1.0f;
+        break;
+
+    case VK_RIGHT:
+        m_Input.x = 1.0f;
+        m_Input.y = 0.0f;
+        break;
+
+    case VK_DOWN:
+        m_Input.x = 0.0f;
+        m_Input.y = 1.0f;
+        break;
+
+    case VK_LEFT:
+        m_Input.x =-1.0f;
+        m_Input.y = 0.0f;
+        break;
+
 
   }//end switch
 }

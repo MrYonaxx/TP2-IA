@@ -35,6 +35,7 @@ private:
   //the steering behavior class
   SteeringBehavior*     m_pSteering;
 
+  Vector2D m_input;
 
   //some steering behaviors give jerky looking movement. The
   //following members are used to smooth the vehicle's heading
@@ -90,6 +91,7 @@ public:
 
   
   Vector2D    SmoothedHeading()const{return m_vSmoothedHeading;}
+  Vector2D    Input()const{return m_input;}
 
   bool        isSmoothingOn()const{return m_bSmoothingOn;}
   void        SmoothingOn(){m_bSmoothingOn = true;}
@@ -97,6 +99,8 @@ public:
   void        ToggleSmoothing(){m_bSmoothingOn = !m_bSmoothingOn;}
   
   double       TimeElapsed()const{return m_dTimeElapsed;}
+
+  void        SetInput(Vector2D input) { m_input = input; }
  
 };
 

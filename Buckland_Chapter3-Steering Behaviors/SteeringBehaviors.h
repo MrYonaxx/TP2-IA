@@ -77,6 +77,7 @@ private:
 
 private:
 
+  bool         m_userControlled;
   
   //a pointer to the owner of this instance
   Vehicle*     m_pVehicle;   
@@ -289,6 +290,8 @@ public:
   //renders visual aids and info for seeing how each behavior is
   //calculated
   void      RenderAids();
+
+  void      SetUserControl(bool value) { m_userControlled = value; }
 
   void      SetTarget(const Vector2D t){m_vTarget = t;}
 
